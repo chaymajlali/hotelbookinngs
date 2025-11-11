@@ -1,75 +1,49 @@
 import express from "express";
-import "dotenv/config.js";
 import cors from "cors";
-import connectDB from "./configs/db.js";
-import userRouter from "./routes/userRoutes.js";
-import hotelRouter from "./routes/hotelRoutes.js";
-import roomRouter from "./routes/roomRoutes.js";
-import bookingRouter from "./routes/bookingRoutes.js";
-import authRouter from "./routes/authRoutes.js";
-import connectCloudinary from "./configs/cloudinary.js";
-import faceAuthRoutes from "./routes/faceAuthRoutes.js";
 
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+app.use(express.json());
 
-// ✅ Route de base IMMÉDIATE
-app.get("/", (req, res) => res.send("API IS WORKING - SERVEUR ACTIF"));
+console.log("🔧 Démarrage du serveur...");
 
-// ✅ Variables de statut
-let dbConnected = false;
-let cloudinaryConnected = false;
-
-// ✅ Connexion DB sans bloquer le démarrage
-connectDB().then(success => {
-  dbConnected = success;
-  if (success) {
-    console.log("✅ MongoDB connecté - Activation des routes API");
-    // Activer les routes API seulement si DB connectée
-    app.use("/api/auth", authRouter);
-    app.use("/api/user", userRouter);
-    app.use("/api/hotels", hotelRouter);
-    app.use("/api/rooms", roomRouter);
-    app.use("/api/bookings", bookingRouter);
-    app.use("/api/face", faceAuthRoutes);
-  } else {
-    console.log("⚠️ Routes API désactivées - DB non connectée");
-  }
+// Test des variables d'environnement
+console.log("📦 Variables env:", {
+  hasMongoURI: !!process.env.MONGODB_URI,
+  hasJWTSecret: !!process.env.JWT_SECRET,
+  hasCloudinary: !!process.env.CLOUDINARY_CLOUD_NAME
 });
 
-// ✅ Connexion Cloudinary sans bloquer
-connectCloudinary().then(success => {
-  cloudinaryConnected = success;
-  if (success) {
-    console.log("✅ Cloudinary connecté");
-  } else {
-    console.log("⚠️ Cloudinary non connecté");
-  }
+// Route ultra simple
+app.get("/", (req, res) => {
+  console.log("✅ Route / appelée");
+  res.send("🚀 SERVEUR EXPRESS FONCTIONNE");
 });
 
-// ✅ Route de santé pour vérifier les connexions
-app.get("/health", (req, res) => {
-  res.json({
-    status: "server_running",
-    database: dbConnected ? "connected" : "disconnected",
-    cloudinary: cloudinaryConnected ? "connected" : "disconnected",
+app.get("/api/test", (req, res) => {
+  res.json({ 
+    status: "success", 
+    message: "API fonctionne",
     timestamp: new Date().toISOString()
   });
 });
 
-// ✅ Route de test API basique
-app.get("/api/test", (req, res) => {
+app.get("/health", (req, res) => {
   res.json({
-    message: "API endpoint working",
-    database: dbConnected ? "active" : "inactive",
-    timestamp: new Date().toISOString()
+    server: "running",
+    database: "not_checked",
+    cloudinary: "not_checked",
+    environment: {
+      hasMongo: !!process.env.MONGODB_URI,
+      hasJWT: !!process.env.JWT_SECRET,
+      hasCloudinary: !!process.env.CLOUDINARY_CLOUD_NAME
+    }
   });
 });
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`🔧 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`✅ Serveur démarré sur le port ${PORT}`);
 });
+
+console.log("🔧 Configuration Express terminée");
