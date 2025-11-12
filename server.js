@@ -2,14 +2,14 @@
 import express from "express";
 import "dotenv/config.js";
 import cors from "cors";
-import connectDB from "./configs/db.js";
-import userRouter from "./routes/userRoutes.js";
-import hotelRouter from "./routes/hotelRoutes.js";
-import roomRouter from "./routes/roomRoutes.js";
-import bookingRouter from "./routes/bookingRoutes.js";
-import authRouter from "./routes/authRoutes.js";
-import connectCloudinary from "./configs/cloudinary.js";
-import faceAuthRoutes from "./routes/faceAuthRoutes.js";
+import connectDB from "./server/configs/db.js";
+import userRouter from "./server/routes/userRoutes.js";
+import hotelRouter from "./server/routes/hotelRoutes.js";
+import roomRouter from "./server/routes/roomRoutes.js";
+import bookingRouter from "./server/routes/bookingRoutes.js";
+import authRouter from "./server/routes/authRoutes.js";
+import connectCloudinary from "./server/configs/cloudinary.js";
+import faceAuthRoutes from "./server/routes/faceAuthRoutes.js";
 connectDB();
 connectCloudinary();
 
