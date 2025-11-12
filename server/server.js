@@ -1,49 +1,30 @@
+// server.js
 import express from "express";
+import "dotenv/config.js";
 import cors from "cors";
+import connectDB from "./configs/db.js";
+import userRouter from "./routes/userRoutes.js";
+import hotelRouter from "./routes/hotelRoutes.js";
+import roomRouter from "./routes/roomRoutes.js";
+import bookingRouter from "./routes/bookingRoutes.js";
+import authRouter from "./routes/authRoutes.js";
+import connectCloudinary from "./configs/cloudinary.js";
+import faceAuthRoutes from "./routes/faceAuthRoutes.js";
+connectDB();
+connectCloudinary();
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
-console.log("🔧 Démarrage du serveur...");
+app.get("/", (req, res) => res.send("API IS WORKING"));
 
-// Test des variables d'environnement
-console.log("📦 Variables env:", {
-  hasMongoURI: !!process.env.MONGODB_URI,
-  hasJWTSecret: !!process.env.JWT_SECRET,
-  hasCloudinary: !!process.env.CLOUDINARY_CLOUD_NAME
-});
-
-// Route ultra simple
-app.get("/", (req, res) => {
-  console.log("✅ Route / appelée");
-  res.send("🚀 SERVEUR EXPRESS FONCTIONNE");
-});
-
-app.get("/api/test", (req, res) => {
-  res.json({ 
-    status: "success", 
-    message: "API fonctionne",
-    timestamp: new Date().toISOString()
-  });
-});
-
-app.get("/health", (req, res) => {
-  res.json({
-    server: "running",
-    database: "not_checked",
-    cloudinary: "not_checked",
-    environment: {
-      hasMongo: !!process.env.MONGODB_URI,
-      hasJWT: !!process.env.JWT_SECRET,
-      hasCloudinary: !!process.env.CLOUDINARY_CLOUD_NAME
-    }
-  });
-});
-
+app.use("/api/auth", authRouter);  // ✅ new auth routes
+app.use("/api/user", userRouter);
+app.use("/api/hotels", hotelRouter);
+app.use("/api/rooms", roomRouter);
+app.use("/api/bookings", bookingRouter);
+app.use("/api/face", faceAuthRoutes);
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`✅ Serveur démarré sur le port ${PORT}`);
-});
-
-console.log("🔧 Configuration Express terminée");
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
